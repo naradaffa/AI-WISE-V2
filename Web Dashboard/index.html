@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI WISE Dashboard - 2 Devices</title>
+    
+    <link rel="stylesheet" href="css/style.css">
+    
+    <script src="js/chart.js"></script> 
+</head>
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>AI WISE</h1>
+            <p>SISTEM WEARABLE BERBASIS KECERDASAN BUATAN UNTUK PEMANTAUAN REAL-TIME BAHAYA KESELAMATAN PEKERJA KONSTRUKSI DI INDONESIA</p>
+        </div>
+    </header>
+
+    <main>
+        <div class="device-section">
+            <div class="section-header">
+                <h2 class="section-title">Pemantauan Pekerja 1</h2>
+                <div class="connection-status disconnected" id="ws-status-1">Menghubungkan...</div>
+            </div>
+            
+            <section class="record-panel">
+                <button id="btn-start-1" onclick="startRecord(1)">▶ MULAI REKAM 1</button>
+                <button id="btn-stop-1" onclick="stopRecord(1)" disabled>⏹ BERHENTI</button>
+                <a id="btn-download-1" class="btn-download">⬇ DOWNLOAD CSV 1</a>
+                <span id="record-status-1" class="status-text">Status: Standby</span>
+            </section>
+
+            <section class="cards-container">
+                <div class="card">
+                    <span class="card-title">Total Akselerasi</span>
+                    <div class="card-value"><span id="val-total-accel-1">0.00</span> m/s&sup2;</div>
+                </div>
+                <div class="card">
+                    <span class="card-title">Pitch (Tundukan)</span>
+                    <div class="card-value"><span id="val-pitch-1">0.0</span>&deg;</div>
+                </div>
+                <div class="card">
+                    <span class="card-title">Roll (Kemiringan)</span>
+                    <div class="card-value"><span id="val-roll-1">0.0</span>&deg;</div>
+                </div>
+                <div class="card">
+                    <span class="card-title">Yaw (Arah)</span>
+                    <div class="card-value"><span id="val-yaw-1">0.0</span>&deg;</div>
+                </div>
+                <div class="card">
+                    <span class="card-title">Suhu Lingkungan</span>
+                    <div class="card-value"><span id="val-temp-1">0.0</span> &deg;C</div>
+                </div>
+                <div class="card">
+                    <span class="card-title">Kelembaban Udara</span>
+                    <div class="card-value"><span id="val-hum-1">0.0</span> %</div>
+                </div>
+                <div class="card">
+                    <span class="card-title">Detak Jantung</span>
+                    <div class="card-value"><span id="val-bpm-1">0</span> BPM</div>
+                </div>
+                <div class="card">
+                    <span class="card-title">Kadar Oksigen (SpO2)</span>
+                    <div class="card-value"><span id="val-spo2-1">0</span> %</div>
+                </div>
+                <div class="card card-gps">
+                    <span class="card-title">Koordinat GPS</span>
+                    <div class="card-value gps-text">
+                        Lat: <span id="val-lat-1">0.000000</span><br>
+                        Lng: <span id="val-lng-1">0.000000</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="charts-row">
+                <div class="chart-card">
+                    <h3>Akselerasi 3 Sumbu Pekerja 1 (m/s&sup2;)</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="chartAccel-1"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h3>Gyroscope 3 Sumbu Pekerja 1 (&deg;/s)</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="chartGyro-1"></canvas>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="device-section">
+            <div class="section-header">
+                <h2 class="section-title">Pemantauan Pekerja 2</h2>
+                <div class="connection-status disconnected" id="ws-status-2">Menghubungkan...</div>
+            </div>
+            
+            <section class="record-panel">
+                <button id="btn-start-2" onclick="startRecord(2)">▶ MULAI REKAM 2</button>
+                <button id="btn-stop-2" onclick="stopRecord(2)" disabled>⏹ BERHENTI</button>
+                <a id="btn-download-2" class="btn-download">⬇ DOWNLOAD CSV 2</a>
+                <span id="record-status-2" class="status-text">Status: Standby</span>
+            </section>
+
+            <section class="cards-container">
+                <div class="card">
+                    <span class="card-title">Total Akselerasi</span>
+                    <div class="card-value"><span id="val-total-accel-2">0.00</span> m/s&sup2;</div>
+                </div>
+                <div class="card">
+                    <span class="card-title">Pitch (Tundukan)</span>
+                    <div class="card-value"><span id="val-pitch-2">0.0</span>&deg;</div>
+                </div>
+                <div class="card">
+                    <span class="card-title">Roll (Kemiringan)</span>
+                    <div class="card-value"><span id="val-roll-2">0.0</span>&deg;</div>
+                </div>
+                <div class="card">
+                    <span class="card-title">Yaw (Arah)</span>
+                    <div class="card-value"><span id="val-yaw-2">0.0</span>&deg;</div>
+                </div>
+                <div class="card">
+                    <span class="card-title">Suhu Lingkungan</span>
+                    <div class="card-value"><span id="val-temp-2">0.0</span> &deg;C</div>
+                </div>
+                <div class="card">
+                    <span class="card-title">Kelembaban Udara</span>
+                    <div class="card-value"><span id="val-hum-2">0.0</span> %</div>
+                </div>
+                <div class="card">
+                    <span class="card-title">Detak Jantung</span>
+                    <div class="card-value"><span id="val-bpm-2">0</span> BPM</div>
+                </div>
+                <div class="card">
+                    <span class="card-title">Kadar Oksigen (SpO2)</span>
+                    <div class="card-value"><span id="val-spo2-2">0</span> %</div>
+                </div>
+                <div class="card card-gps">
+                    <span class="card-title">Koordinat GPS</span>
+                    <div class="card-value gps-text">
+                        Lat: <span id="val-lat-2">0.000000</span><br>
+                        Lng: <span id="val-lng-2">0.000000</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="charts-row">
+                <div class="chart-card">
+                    <h3>Akselerasi 3 Sumbu Pekerja 2 (m/s&sup2;)</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="chartAccel-2"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h3>Gyroscope 3 Sumbu Pekerja 2 (&deg;/s)</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="chartGyro-2"></canvas>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
