@@ -17,7 +17,7 @@
 // =======================================================
 const char* ssid = "TMP";
 const char* password = "ugmjaya1";
-const char* mdns_hostname = "pekerja8";
+const char* mdns_hostname = "pekerja1"; // Ganti dengan pekerja1 s.d. pekerja10
 
 AsyncWebServer server(80);
 AsyncEventSource events("/events");
@@ -110,7 +110,7 @@ void setup() {
   display.setTextSize(1);
   display.setTextColor(SSD1306_WHITE);
   display.setCursor(0, 0);
-  display.println("Sistem pekerja 8");
+  display.println("Sistem pekerja 1");
   display.println("Inisialisasi...");
   display.display();
 
@@ -151,7 +151,7 @@ void setup() {
 
   DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");
   events.onConnect([](AsyncEventSourceClient *client) {
-    client->send("Terhubung ke pekerja 8 Node", NULL, millis(), 10000);
+    client->send("Terhubung ke pekerja 1 Node", NULL, millis(), 10000);
   });
   server.addHandler(&events);
   server.begin();
@@ -421,7 +421,7 @@ void loop() {
     lastSseSend = nowMillis;
 
     StaticJsonDocument<768> doc;
-    doc["device"] = "pekerja8";
+    doc["device"] = "pekerja1";
     doc["time"] = nowMillis;
     doc["x"] = round(aX * 100) / 100.0;
     doc["y"] = round(aY * 100) / 100.0;
@@ -452,7 +452,7 @@ void loop() {
   // 9. Serial Output Log
   if (nowMillis - lastPrintTime >= 500) {
     lastPrintTime = nowMillis;
-    Serial.printf("pekerja 8 -> Roll:%.1f Pitch:%.1f Yaw:%.1f | Temp:%.1fC Hum:%.1f%% | Flex:%d | Lat:%.5f Lng:%.5f | Status:%s\n",
+    Serial.printf("pekerja 1 -> Roll:%.1f Pitch:%.1f Yaw:%.1f | Temp:%.1fC Hum:%.1f%% | Flex:%d | Lat:%.5f Lng:%.5f | Status:%s\n",
                   roll, pitch, yaw, tempC, humidity, flexValue, latitude, longitude, statusJatuh.c_str());
   }
 
