@@ -17,7 +17,7 @@
 // =======================================================
 const char* ssid = "TMP";
 const char* password = "ugmjaya1";
-const char* mdns_hostname = "pekerja10";
+const char* mdns_hostname = "pekerja10"; // Ganti dengan pekerja1 s.d. pekerja10
 
 AsyncWebServer server(80);
 AsyncEventSource events("/events");
