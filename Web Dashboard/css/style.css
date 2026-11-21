@@ -236,3 +236,52 @@ button[id^="btn-stop"] { background: #d32f2f; color: white; }
 .btn-download-all {
     background: #1565c0 !important;
 }
+
+/* =========================================
+   STYLING IKON BATERAI
+   ========================================= */
+.battery-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    color: #333;
+}
+
+.battery-icon {
+    position: relative;
+    width: 30px;
+    height: 15px;
+    border: 2px solid #555;
+    border-radius: 3px;
+    padding: 2px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+}
+
+.battery-icon::after {
+    content: "";
+    position: absolute;
+    right: -5px;
+    top: 3px;
+    width: 3px;
+    height: 6px;
+    background: #555;
+    border-radius: 0 2px 2px 0;
+}
+
+.battery-level {
+    height: 100%;
+    width: 0%;
+    background-color: #4caf50;
+    border-radius: 1px;
+    transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.charging-badge {
+    color: #ff9800;
+    font-weight: 700;
+    font-size: 0.9em;
+}
