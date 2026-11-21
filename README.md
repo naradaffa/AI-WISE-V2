@@ -18,8 +18,8 @@ Perangkat menggunakan **mDNS** sehingga alamat akses otomatis mengikuti nama *ho
 
 1. **Nyalakan Router** - Tunggu hingga jaringan WiFi `TMP` aktif.
 2. **Hubungkan Laptop / PC** - Sambungkan komputer ke jaringan WiFi `TMP`.
-3. **Buka File Web Dashboard di Live Server** — Jalankan `index.html` melalui VS Code Live Server agar dashboard *standby* menerima koneksi SSE.
-4. **Nyalakan Device & Jalankan Kalibrasi 1 per 1** — Pegang alat tegak menghadap depan saat dinyalakan, tunggu hingga proses kalibrasi 3 fase selesai dan layar OLED menampilkan status berjalan, baru lanjutkan menyalakan unit berikutnya.
+3. **Buka File Web Dashboard di Live Server** - Jalankan `index.html` melalui VS Code Live Server agar dashboard *standby* menerima koneksi SSE.
+4. **Nyalakan Device & Jalankan Kalibrasi 1 per 1** - Pegang alat tegak menghadap depan saat dinyalakan, tunggu hingga proses kalibrasi 3 fase selesai dan layar OLED menampilkan status berjalan, baru lanjutkan menyalakan unit berikutnya.
 
 ---
 
@@ -46,12 +46,12 @@ Pegang alat dalam posisi tegak menghadap ke depan saat pertama kali dinyalakan (
 | Tahap | Tampilan OLED & Buzzer | Instruksi & Tujuan |
 | :--- | :--- | :--- |
 | **Booting** | `Sistem pekerja10 / Inisialisasi...` | Tunggu inisialisasi sensor I2C dan koneksi WiFi. |
-| **Fase 1 (~1.5s)** | `Fase 1: DIAMKAN` + Bunyi Buzzer 1x | Pegang alat tegak & diam total (kalibrasi bias Accel & Gyro). |
+| **Fase 1 (~1.5s)** | `Fase 1: DIAMKAN` + Bunyi Buzzer 1x | Letakkan alat di meja dan menghadap depan. |
 | **Persiapan 2 (3s)** | `Siap putar 360...` | Bersiap memutar perangkat secara mendatar. |
-| **Fase 2 (5s)** | `Fase 2: PUTAR 360` + Bunyi Buzzer 1x | Putar alat horizontal 360° secara perlahan (kalibrasi *hard-iron* kompas QMC5883L & deteksi sumbu horizontal). |
+| **Fase 2 (5s)** | `Fase 2: PUTAR 360` + Bunyi Buzzer 1x | Putar alat secara CCW 360° secara perlahan. |
 | **Persiapan 3 (3s)** | `Hadapkan depan & diamkan (3 dtk)` | Arahkan perangkat lurus ke depan sesuai orientasi pemakaian. |
-| **Fase 3** | `Fase 3: KUNCI TITIK 0` + Bunyi Buzzer 1x | Tahan diam sesaat untuk mengunci referensi titik 0° (Roll, Pitch, Yaw). |
-| **Berjalan** | Status `BAT`, `GPS`, `KOMUNIKASI: SSE` + Buzzer 1x | Pasang di sabuk/tubuh pekerja, perangkat aktif mengirim data 100 Hz. |
+| **Fase 3** | `Fase 3: KUNCI TITIK 0` + Bunyi Buzzer 1x | Tahan diam sesaat untuk mengunci referensi titik 0°. |
+| **Berjalan** | Status `BAT`, `GPS`, `KOMUNIKASI: SSE` + Buzzer 1x | Pasang di sabuk/tubuh pekerja, perangkat aktif mengirim data. |
 
 ---
 
