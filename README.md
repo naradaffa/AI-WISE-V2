@@ -2,8 +2,6 @@
 
 Sistem *wearable motion tracking*, pemantauan biometrik, dan *fall detection* real-time untuk keselamatan pekerja. Berbasis **ESP32** dengan **MPU6050**, **GY273**, **OLED SSD1306**, **GPS NEO-6M**, **MAX30102**, **DHT21**, dan transmisi data real-time ke Web Dashboard via WiFi.
 
----
-
 ## 🚀 Persiapan & Koneksi WiFi
 
 Perangkat menggunakan **mDNS** sehingga alamat akses otomatis mengikuti nama *hostname* masing-masing perangkat tanpa perlu mengecek IP dinamis.
@@ -21,8 +19,6 @@ Perangkat menggunakan **mDNS** sehingga alamat akses otomatis mengikuti nama *ho
 3. **Buka File Web Dashboard di Live Server** - Jalankan `index.html` melalui VS Code Live Server agar dashboard *standby* menerima koneksi SSE.
 4. **Nyalakan Device & Jalankan Kalibrasi 1 per 1** - Letakkan alat menghadap depan saat dinyalakan, tunggu hingga proses kalibrasi 3 fase selesai dan layar OLED menampilkan status berjalan, baru lanjutkan menyalakan unit berikutnya.
 
----
-
 ## 🔗 Cara Menjalankan Web Dashboard
 
 1. **Unduh File Project:** Download folder **Web Dashboard** (format `.zip`) dari repositori ini.
@@ -36,8 +32,6 @@ Perangkat menggunakan **mDNS** sehingga alamat akses otomatis mengikuti nama *ho
    - Dashboard akan otomatis terbuka di browser default Anda.
 
 > **Catatan:** Pastikan ekstensi **Live Server** oleh Ritwick Dey sudah terinstal di Visual Studio Code.
-
----
 
 ## 🚨 Kalibrasi & Indikator OLED / Buzzer
 
@@ -53,8 +47,6 @@ Pegang alat dalam posisi tegak menghadap ke depan saat pertama kali dinyalakan (
 | **Fase 3** | `Fase 3: KUNCI TITIK 0` + Bunyi Buzzer 1x | Tahan diam sesaat untuk mengunci referensi titik 0°. |
 | **Berjalan** | Status `BAT`, `GPS`, `KOMUNIKASI: SSE` + Buzzer 1x | Pasang di sabuk/tubuh pekerja, perangkat aktif mengirim data. |
 
----
-
 ## 📊 Standar Pengukuran & Parameter Sensor
 
 - **ROLL:** Menunduk (-), Tengadah (+) dalam derajat (`°`)
@@ -67,15 +59,11 @@ Pegang alat dalam posisi tegak menghadap ke depan saat pertama kali dinyalakan (
 - **Lokasi:** Koordinat GPS dari **u-blox NEO-6M**
 - **Baterai:** Persentase kapasitas baterai serta status pengisian daya
 
----
-
 ## 🛠️ Tombol Reset Posisi (Tare Instan)
 
 - **Fungsi:** Mengembalikan referensi orientasi sudut ke titik `0.0°` (`Roll`, `Pitch`, `Yaw`) tanpa perlu *reboot* perangkat.
 - **Cara Pakai:** Tekan dan tahan tombol selama **1,5 detik**.
 - **Indikator Sukses:** Buzzer berbunyi selama 0.3s dan layar OLED menampilkan `REFERENSI TITIK 0 DIRESET!` selama 2 detik.
-
----
 
 ## 📂 Struktur Repositori
 
