@@ -17,11 +17,10 @@
 // =======================================================
 const char* ssid = "TMP";
 const char* password = "ugmjaya1";
-const char* mdns_hostname = "pekerja1";
+const char* mdns_hostname = "pekerja9";
 
 AsyncWebServer server(80);
-AsyncEventSource events("/events"); // Endpoint SSE: http://pekerja1.local/events
-
+AsyncEventSource events("/events");
 // =======================================================
 // ALAMAT I2C & PIN HARDWARE
 // =======================================================
@@ -30,7 +29,6 @@ AsyncEventSource events("/events"); // Endpoint SSE: http://pekerja1.local/event
 #define GPS_RX_PIN    D7
 #define GPS_TX_PIN    D6
 #define DHT_PIN       D3
-#define FLEX_PIN      A0
 #define BUZZER_PIN    D8
 #define BUTTON_PIN    D2
 #define BAT_ADC_PIN   D9
@@ -57,7 +55,7 @@ HardwareSerial gpsSerial(1);
 float aX_bias = 0, aY_bias = 0, aZ_bias = 0;
 float gX_bias = 0, gY_bias = 0, gZ_bias = 0;
 
-// Hard-iron bias & filter untuk 3 sumbu QMC5883L (0=X, 1=Y, 2=Z)
+// Hard-iron bias & filter untuk 3 sumbu QMC5883L
 float m_bias[3] = {0, 0, 0};
 float m_filt[3] = {0, 0, 0};
 bool magInitialized = false;
@@ -70,7 +68,6 @@ float roll_bias = 0, pitch_bias = 0, yaw_bias = 0;
 
 // Variabel Data Sensor
 float tempC = 0.0, humidity = 0.0;
-int flexValue = 0;
 float latitude = 0.0, longitude = 0.0;
 int heartRate = 0, spo2 = 0;
 int batPercent = 0;
@@ -93,7 +90,7 @@ bool resetTriggered = false;
 unsigned long tareBeepEndTime = 0;
 unsigned long tareDisplayUntil = 0;
 
-// State terakhir OLED (agar hanya update saat ada perubahan)
+// State terakhir OLED
 int lastOledBat = -1;
 bool lastOledChg = false;
 bool lastOledGps = false;
@@ -252,11 +249,11 @@ void runFullCalibration() {
 
   // Deteksi otomatis 2 sumbu horizontal
   if (delta[0] <= delta[1] && delta[0] <= delta[2]) {
-    hAxis1 = 1; hAxis2 = 2; // Sumbu Y & Z
+    hAxis1 = 1; hAxis2 = 2; 
   } else if (delta[1] <= delta[0] && delta[1] <= delta[2]) {
-    hAxis1 = 0; hAxis2 = 2; // Sumbu X & Z
+    hAxis1 = 0; hAxis2 = 2; 
   } else {
-    hAxis1 = 0; hAxis2 = 1; // Sumbu X & Y
+    hAxis1 = 0; hAxis2 = 1; 
   }
 
   const char axisName[3] = {'X', 'Y', 'Z'};
@@ -326,9 +323,14 @@ void setup() {
   dht.begin();
 
   if (particleSensor.begin(Wire, I2C_SPEED_FAST)) {
-    particleSensor.setup();
-    particleSensor.setPulseAmplitudeRed(0x0A);
-    particleSensor.setPulseAmplitudeGreen(0);
+    byte ledBrightness = 0x1F; 
+    byte sampleAverage = 4;    
+    byte ledMode = 2;          
+    int sampleRate = 200;      
+    int pulseWidth = 411;
+    int adcRange = 4096;
+
+    particleSensor.setup(ledBrightness, sampleAverage, ledMode, sampleRate, pulseWidth, adcRange);
   }
   Wire.setClock(400000);
 
@@ -389,40 +391,82 @@ void loop() {
   // 2. Baca MAX30102
   if (now - lastMaxRead >= 20) {
     lastMaxRead = now;
-    long irValue = particleSensor.getIR();
+    particleSensor.check();
 
-    static unsigned long lastBeatTime = 0;
+    while (particleSensor.available()) {
+      uint32_t redValue = particleSensor.getFIFORed();
+      uint32_t irValue  = particleSensor.getFIFOIR();
+      particleSensor.nextSample();
 
-    // Cek apakah MAX30102 benar-benar menempel di kulit
-    if (irValue < 50000) {
-      heartRate = 0;
-      spo2 = 0;
-      lastBeatTime = 0;
-    } else {
-      if (checkForBeat(irValue) == true) {
-        unsigned long delta = now - lastBeatTime;
-        lastBeatTime = now;
+      static unsigned long lastBeatTime = 0;
+      static float dcRed = 0, dcIr = 0;
+      static float minRed = 1e9, maxRed = 0;
+      static float minIr  = 1e9, maxIr  = 0;
+      static float smoothSpo2 = 0;
 
-        // Validasi jarak antar detak
-        if (delta > 333 && delta < 1333) {
-          float beatsPerMinute = 60000.0 / delta;
-          heartRate = (int)beatsPerMinute;
-          spo2 = random(96, 99); // Placeholder SpO2 selama detak valid
-        }
-      }
-
-      // Timeout: jika 3 detik tidak ada detak valid, reset ke 0
-      if (lastBeatTime != 0 && (now - lastBeatTime > 3000)) {
+      // Cek apakah MAX30102 benar-benar menempel di kulit
+      if (irValue < 50000) {
         heartRate = 0;
         spo2 = 0;
+        lastBeatTime = 0;
+        dcRed = 0; dcIr = 0;
+        minRed = 1e9; maxRed = 0;
+        minIr  = 1e9; maxIr  = 0;
+        smoothSpo2 = 0;
+      } else {
+        // Estimasi komponen DC menggunakan EMA filter
+        if (dcRed == 0) { dcRed = redValue; dcIr = irValue; }
+        dcRed = 0.95 * dcRed + 0.05 * redValue;
+        dcIr  = 0.95 * dcIr  + 0.05 * irValue;
+
+        // Lacak puncak maksimum & minimum sinyal pulsa
+        if (redValue < minRed) minRed = redValue;
+        if (redValue > maxRed) maxRed = redValue;
+        if (irValue  < minIr)  minIr  = irValue;
+        if (irValue  > maxIr)  maxIr  = irValue;
+
+        // Deteksi puncak detak jantung
+        if (checkForBeat(irValue) == true) {
+          unsigned long delta = now - lastBeatTime;
+          lastBeatTime = now;
+
+          // Validasi jarak antar detak
+          if (delta > 333 && delta < 1333) {
+            float beatsPerMinute = 60000.0 / delta;
+            heartRate = (heartRate == 0) ? (int)beatsPerMinute : (int)(0.7 * heartRate + 0.3 * beatsPerMinute);
+
+            // Hitung Rasio Optik
+            float acRed = maxRed - minRed;
+            float acIr  = maxIr  - minIr;
+
+            if (acIr > 0 && dcRed > 0 && dcIr > 0) {
+              float R = (acRed / dcRed) / (acIr / dcIr);
+              float rawSpo2 = 104.0 - 17.0 * R;
+              rawSpo2 = constrain(rawSpo2, 80.0, 100.0);
+
+              smoothSpo2 = (smoothSpo2 == 0) ? rawSpo2 : (0.75 * smoothSpo2 + 0.25 * rawSpo2);
+              spo2 = (int)round(smoothSpo2);
+            }
+          }
+
+          // Reset pelacak puncak untuk siklus detak berikutnya
+          minRed = 1e9; maxRed = 0;
+          minIr  = 1e9; maxIr  = 0;
+        }
+
+        // Timeout: jika 3 detik tidak ada detak valid, reset ke 0
+        if (lastBeatTime != 0 && (now - lastBeatTime > 3000)) {
+          heartRate = 0;
+          spo2 = 0;
+          smoothSpo2 = 0;
+        }
       }
     }
   }
 
-  // 3. Baca Flex & Baterai
+  // 3. Baca Baterai
   if (now - lastAdcRead >= 200) {
     lastAdcRead = now;
-    flexValue = analogRead(FLEX_PIN);
 
     uint32_t mvSum = 0;
     for (int k = 0; k < 16; k++) mvSum += analogReadMilliVolts(BAT_ADC_PIN);
@@ -534,7 +578,6 @@ void loop() {
       doc["total"]  = round(totalAcc * 100) / 100.0;
       doc["temp"]   = round(tempC * 10) / 10.0;
       doc["hum"]    = round(humidity * 10) / 10.0;
-      doc["flex"]   = flexValue;
       doc["bpm"]    = heartRate;
       doc["spo2"]   = spo2;
       doc["lat"]    = latitude;
