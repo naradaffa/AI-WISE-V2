@@ -16,11 +16,10 @@ Perangkat menggunakan **mDNS** sehingga alamat akses otomatis mengikuti nama *ho
 
 > Disarankan menyalakan perangkat **satu per satu** dan menunggu hingga proses kalibrasi 3 fase selesai sebelum menyalakan perangkat berikutnya.
 
-1. **Nyalakan Router / Hotspot** - Tunggu hingga jaringan WiFi `TMP` aktif penuh.
-2. **Nyalakan Device 1** - Pegang lurus sesuai arah depan, tunggu hingga layar OLED menampilkan status berjalan (`KOMUNIKASI: SSE`).
-3. **Nyalakan Device 2** — Ulangi proses kalibrasi hingga layar OLED masuk ke tampilan utama.
-4. **Nyalakan Device N** — Lanjutkan secara bertahap untuk unit berikutnya.
-5. **Hubungkan Laptop / PC** — Sambungkan ke jaringan WiFi `TMP` yang sama.
+1. **Nyalakan Router** - Tunggu hingga jaringan WiFi `TMP` aktif.
+2. **Hubungkan Laptop / PC** - Sambungkan komputer ke jaringan WiFi `TMP`.
+3. **Buka File Web Dashboard di Live Server** — Jalankan `index.html` melalui VS Code Live Server agar dashboard *standby* menerima koneksi SSE.
+4. **Nyalakan Device & Jalankan Kalibrasi 1 per 1** — Pegang alat tegak menghadap depan saat dinyalakan, tunggu hingga proses kalibrasi 3 fase selesai dan layar OLED menampilkan status berjalan, baru lanjutkan menyalakan unit berikutnya.
 
 ---
 
