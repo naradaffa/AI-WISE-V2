@@ -79,5 +79,5 @@ Pegang alat dalam posisi tegak menghadap ke depan saat pertama kali dinyalakan (
 
 ## 📂 Struktur Repositori
 
-- **ESP32 (`v2_fix_mpu6050.ino`):** Kode program ESP32.
+- **ESP32 (`v2_fix.ino`):** Kode program ESP32.
 - **Web Dashboard:** File antarmuka visual berbasis web yang menerima aliran data *real-time* melalui protokol SSE.
