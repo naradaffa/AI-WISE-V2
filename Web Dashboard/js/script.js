@@ -8,20 +8,24 @@ const IP_LIST = Array.from({ length: TOTAL_DEVICES }, (_, i) => `http://pekerja$
 
 const MAX_CHART_POINTS = 75;
 const CSV_HEADER_STD = "Timestamp(ms),AccX,AccY,AccZ,GyroX,GyroY,GyroZ,Roll,Pitch,Yaw,Suhu(C),Kelembaban(%),DetakJantung(BPM),SpO2(%),Latitude,Longitude";
-const CSV_HEADER_FLEX = "Timestamp(ms),AccX,AccY,AccZ,GyroX,GyroY,GyroZ,Roll,Pitch,Yaw,Suhu(C),Kelembaban(%),DetakJantung(BPM),SpO2(%),Latitude,Longitude,FlexSensor";
 
 const container = document.getElementById('dashboard-container');
 let htmlBuilder = '';
 
 for (let i = 1; i <= TOTAL_DEVICES; i++) {
-    const flexCardHtml = (i === 1 || i === 2) 
-        ? `<div class="card"><span class="card-title">Flex Sensor (Tekukan)</span><div class="card-value"><span id="val-flex-${i}">0</span> %</div></div>` 
-        : '';
-
     htmlBuilder += `
     <div class="device-section">
         <div class="section-header">
             <h2 class="section-title">Pemantauan Pekerja ${i}</h2>
+            <div class="battery-status" style="display: inline-flex; align-items: center; gap: 6px;">
+                <svg width="24" height="12" viewBox="0 0 24 12" style="display: block;">
+                    <rect x="0.75" y="0.75" width="19.5" height="10.5" rx="2" fill="none" stroke="#555" stroke-width="1.5"/>
+                    <rect id="bat-fill-${i}" x="2.5" y="2.5" width="0" height="7" rx="1" fill="#9e9e9e"/>
+                    <path d="M22 4v4" stroke="#555" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                <span><span id="val-bat-${i}">--</span>%</span>
+                <span id="val-chg-${i}" style="color: #555; font-size: 0.85em; display: none;">(Charging)</span>
+            </div>
             <div class="connection-status disconnected" id="ws-status-${i}">Menghubungkan...</div>
         </div>
         
@@ -41,7 +45,6 @@ for (let i = 1; i <= TOTAL_DEVICES; i++) {
             <div class="card"><span class="card-title">Kelembaban Udara</span><div class="card-value"><span id="val-hum-${i}">0.0</span> %</div></div>
             <div class="card"><span class="card-title">Detak Jantung</span><div class="card-value"><span id="val-bpm-${i}">0</span> BPM</div></div>
             <div class="card"><span class="card-title">Kadar Oksigen (SpO2)</span><div class="card-value"><span id="val-spo2-${i}">0</span> %</div></div>
-            ${flexCardHtml}
             <div class="card card-gps">
                 <span class="card-title">Koordinat GPS</span>
                 <div class="card-value gps-text">
@@ -139,12 +142,7 @@ for (let i = 1; i <= TOTAL_DEVICES; i++) {
                 const parsed = JSON.parse(e.data);
                 latestData[i] = parsed;
                 if (isRecording[i]) {
-                    let row = `${parsed.time || 0},${parsed.x},${parsed.y},${parsed.z},${parsed.gx || 0},${parsed.gy || 0},${parsed.gz || 0},${parsed.roll},${parsed.pitch},${parsed.yaw},${parsed.temp || 0},${parsed.hum || 0},${parsed.bpm || 0},${parsed.spo2 || 0},${parsed.lat || 0},${parsed.lng || 0}`;
-                    
-                    if (i === 1 || i === 2) {
-                        row += `,${parsed.flex || 0}`;
-                    }
-                    
+                    const row = `${parsed.time || 0},${parsed.x},${parsed.y},${parsed.z},${parsed.gx || 0},${parsed.gy || 0},${parsed.gz || 0},${parsed.roll},${parsed.pitch},${parsed.yaw},${parsed.temp || 0},${parsed.hum || 0},${parsed.bpm || 0},${parsed.spo2 || 0},${parsed.lat || 0},${parsed.lng || 0}`;
                     csvDataArray[i].push(row);
                     dataCount[i]++;
                 }
@@ -158,7 +156,7 @@ for (let i = 1; i <= TOTAL_DEVICES; i++) {
 // ==========================================
 function startRecord(device) {
     isRecording[device] = true;
-    csvDataArray[device] = (device === 1 || device === 2) ? [CSV_HEADER_FLEX] : [CSV_HEADER_STD];
+    csvDataArray[device] = [CSV_HEADER_STD];
     dataCount[device] = 0;
     
     document.getElementById(`btn-start-${device}`).disabled = true;
@@ -210,7 +208,7 @@ function stopRecordAll() {
     document.getElementById('btn-stop-all').disabled = true;
 
     // Gabungkan seluruh data CSV dari Pekerja 1 sampai 10
-    const masterHeader = "Device_ID," + CSV_HEADER_FLEX;
+    const masterHeader = "Device_ID," + CSV_HEADER_STD;
     let masterRows = [masterHeader];
     let totalAllRows = 0;
 
@@ -218,12 +216,7 @@ function stopRecordAll() {
         if (csvDataArray[i] && csvDataArray[i].length > 1) {
             // Lewati baris header individu [0], ambil baris data [1..n]
             for (let j = 1; j < csvDataArray[i].length; j++) {
-                let rowData = csvDataArray[i][j];
-                // Tambahkan nilai 0 flex sensor untuk Pekerja 3-10 agar format kolom seragam
-                if (i > 2) {
-                    rowData += ",0";
-                }
-                masterRows.push(`Pekerja_${i},${rowData}`);
+                masterRows.push(`Pekerja_${i},${csvDataArray[i][j]}`);
                 totalAllRows++;
             }
         }
@@ -249,6 +242,35 @@ setInterval(() => {
     for (let i = 1; i <= TOTAL_DEVICES; i++) {
         const data = latestData[i];
         if (data) {
+            // Mengupdate persentase, bar isi, dan warna ikon baterai
+            const batFill = document.getElementById(`bat-fill-${i}`);
+            const batText = document.getElementById(`val-bat-${i}`);
+
+            if (data.bat !== undefined) {
+                const batVal = Math.max(0, Math.min(100, parseInt(data.bat)));
+                batText.innerText = batVal;
+                batFill.setAttribute('width', ((batVal / 100) * 16).toFixed(1));
+
+                if (batVal <= 20) {
+                    batFill.setAttribute('fill', '#e53935'); // Merah
+                } else if (batVal <= 50) {
+                    batFill.setAttribute('fill', '#fb8c00'); // Oranye
+                } else {
+                    batFill.setAttribute('fill', '#43a047'); // Hijau
+                }
+            } else {
+                batText.innerText = '--';
+                batFill.setAttribute('width', '0');
+                batFill.setAttribute('fill', '#9e9e9e');
+            }
+
+            // Menampilkan atau menyembunyikan ikon petir charging
+            if (data.chg === true) {
+                document.getElementById(`val-chg-${i}`).style.display = "inline";
+            } else {
+                document.getElementById(`val-chg-${i}`).style.display = "none";
+            }
+
             document.getElementById(`val-total-accel-${i}`).innerText = parseFloat(data.total || 0).toFixed(2);
             document.getElementById(`val-roll-${i}`).innerText = parseFloat(data.roll || 0).toFixed(1);
             document.getElementById(`val-pitch-${i}`).innerText = parseFloat(data.pitch || 0).toFixed(1);
@@ -260,11 +282,6 @@ setInterval(() => {
             document.getElementById(`val-spo2-${i}`).innerText = parseInt(data.spo2 || 0);
             document.getElementById(`val-lat-${i}`).innerText = parseFloat(data.lat || 0).toFixed(6);
             document.getElementById(`val-lng-${i}`).innerText = parseFloat(data.lng || 0).toFixed(6);
-
-            if (i === 1 || i === 2) {
-                const flexVal = document.getElementById(`val-flex-${i}`);
-                if (flexVal) flexVal.innerText = parseInt(data.flex || 0);
-            }
 
             const timeString = data.time ? data.time.toString() : '';
 
