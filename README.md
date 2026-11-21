@@ -72,44 +72,12 @@ Pegang alat dalam posisi tegak menghadap ke depan saat pertama kali dinyalakan (
 ## 🛠️ Tombol Reset Posisi (Tare Instan)
 
 - **Fungsi:** Mengembalikan referensi orientasi sudut ke titik `0.0°` (`Roll`, `Pitch`, `Yaw`) tanpa perlu *reboot* perangkat.
-- **Cara Pakai:** Tekan dan tahan tombol (`D2`) selama **1,5 detik**.
-- **Indikator Sukses:** Buzzer berbunyi selama 300 ms dan layar OLED menampilkan `REFERENSI TITIK 0 DIRESET!` selama 2 detik.
-
----
-
-## 🔌 Konfigurasi Pin Hardware (ESP32)
-
-| Komponen / Fungsi | Pin ESP32 | Keterangan |
-| :--- | :--- | :--- |
-| **I2C SDA** (MPU6050, QMC5883L, MAX30102, OLED) | `D4` | Kecepatan bus 400 kHz (*Fast Mode*) |
-| **I2C SCL** (MPU6050, QMC5883L, MAX30102, OLED) | `D5` | Kecepatan bus 400 kHz (*Fast Mode*) |
-| **GPS NEO-6M (RX / TX)** | `D7` / `D6` | UART Serial1 (9600 bps) |
-| **Sensor Suhu & Kelembapan (DHT21)** | `D3` | Digital One-Wire |
-| **Flex Sensor** | `A0` | Input Analog ADC (*Voltage Divider*) |
-| **Buzzer Aktif** | `D8` | Output Digital |
-| **Tombol Tare / Reset Posisi** | `D2` | `INPUT_PULLUP` (Aktif `LOW`) |
-| **Sensor Tegangan Baterai** | `D9` | Pembagi tegangan 1:2 (`analogReadMilliVolts`) |
-| **Status Charging (TP4056)** | `D10` | `INPUT_PULLUP` (`LOW` = Sedang mengisi daya) |
-
----
-
-## 🔧 Catatan Kalibrasi & Troubleshooting Hardware
-
-### 1. Flex Sensor (Voltage Divider & Stabilitas)
-- **Logging Data Mentah:** Sesuai standar pembacaan pembagi tegangan murni, data `flex` dapat di-*logging* apa adanya dalam rentang nilai ADC mentah (`0 – 4095`) maupun dikonversi ke satuan SI (**radian**) berdasarkan nilai titik lurus (`FLEX_FLAT_ADC`) dan tekuk maksimal (`FLEX_BENT_ADC`).
-- **Mengatasi Nilai Fluktuatif (50–100 diam vs 500–2500 saat disentuh):**
-  - Pastikan jalur resistor pembagi ke `GND` tersambung solid (tidak *floating*).
-  - Lapisi area sensor dan pangkal kaki pin menggunakan selotip isolasi / *heatshrink* agar tidak terjadi kontak langsung dengan kulit tangan yang memicu *noise* 50 Hz.
-  - Tambahkan kapasitor keramik **100 nF (kode `104`)** paralel antara pin `A0` dan `GND` untuk meredam lonjakan *noise*.
-  - Gunakan **Op-Amp Rail-to-Rail 3.3V** (seperti **MCP6002** atau **LMV358**) sebagai *impedance buffer* hanya jika menggunakan sensor berimpedansi sangat tinggi ($>100\text{ k}\Omega$ hingga $\text{M}\Omega$).
-
-### 2. Manajemen Daya & Charging (TP4056)
-- **Kalibrasi Persentase Baterai:** Batas atas tegangan penuh ditetapkan pada **4.05 V = 100%** menggunakan fungsi `analogReadMilliVolts()` dengan *exponential moving average* agar indikator tetap stabil dan tidak tertahan di angka 90%-an saat tegangan baterai mulai turun setelah dilepas dari *charger*.
-- **Isolasi Jalur Baterai:** Saat melakukan pengujian atau *flashing* melalui USB tanpa baterai terpasang, pastikan modul TP4056 tidak mengalami arus balik (*back-feeding*) ke jalur baterai, dan gunakan dioda pemisah (*power path*) atau sakelar fisik pada jalur baterai menuju regulator 3.3V ESP32.
+- **Cara Pakai:** Tekan dan tahan tombol selama **1,5 detik**.
+- **Indikator Sukses:** Buzzer berbunyi selama 0.3s dan layar OLED menampilkan `REFERENSI TITIK 0 DIRESET!` selama 2 detik.
 
 ---
 
 ## 📂 Struktur Repositori
 
-- **ESP32 (`v2_fix_mpu6050.ino`):** Kode program utama *non-blocking* (100 Hz IMU & SSE, 50 Hz MAX30102, 5 Hz ADC/Baterai, 0.2 Hz DHT21) beserta dependensi (`Wire.h`, `WiFi.h`, `ESPmDNS.h`, `ESPAsyncWebServer`, `ArduinoJson`, `TinyGPS++`, `Adafruit_GFX`, `Adafruit_SSD1306`, `DHT`, `MAX30105`).
-- **Web Dashboard:** File antarmuka visual berbasis web (`index.html`, `style.css`, `script.js`) yang menerima aliran data *real-time* melalui protokol SSE.
+- **ESP32 (`v2_fix_mpu6050.ino`):** Kode program ESP32.
+- **Web Dashboard:** File antarmuka visual berbasis web yang menerima aliran data *real-time* melalui protokol SSE.
