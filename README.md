@@ -1,6 +1,6 @@
 # AI WISE V2
 
-Sistem *wearable motion tracking*, pemantauan biometrik, dan *fall detection* real-time untuk keselamatan pekerja. Berbasis **ESP32** dengan arsitektur *non-blocking* (tanpa FreeRTOS), layar **OLED SSD1306**, **GPS NEO-6M**, **MAX30102**, **DHT21**, **Flex Sensor**, dan transmisi data real-time ke Web Dashboard via WiFi (**Server-Sent Events / SSE**).
+Sistem *wearable motion tracking*, pemantauan biometrik, dan *fall detection* real-time untuk keselamatan pekerja. Berbasis **ESP32** dengan **MPU6050**, **GY273**, **OLED SSD1306**, **GPS NEO-6M**, **MAX30102**, **DHT21**, dan transmisi data real-time ke Web Dashboard via WiFi.
 
 ---
 
@@ -10,15 +10,14 @@ Perangkat menggunakan **mDNS** sehingga alamat akses otomatis mengikuti nama *ho
 
 - **WiFi SSID:** `TMP`
 - **Password:** `ugmjaya1`
-- **Endpoint SSE:** `[http://pekerja10.local/events](http://pekerja10.local/events)` *(sesuaikan `mdns_hostname` pada setiap unit perangkat)*
+- **Endpoint SSE:** `http://mdns_hostname.local/events` *(sesuaikan `mdns_hostname` pada setiap unit perangkat, contoh: pekerja1)*
 
 ### ⚠️ Urutan Menyalakan Perangkat
 
-> ⚠️ **PERINGATAN PENTING:**  
-> Wajib menyalakan perangkat **secara berurutan satu per satu** dan menunggu hingga proses kalibrasi 3 fase selesai sebelum menyalakan perangkat berikutnya. Pastikan setiap unit memiliki `mdns_hostname` yang unik (`pekerja1`, `pekerja2`, dst.) agar tidak terjadi konflik jaringan.
+> Disarankan menyalakan perangkat **satu per satu** dan menunggu hingga proses kalibrasi 3 fase selesai sebelum menyalakan perangkat berikutnya.
 
-1. **Nyalakan Router / Hotspot** — Tunggu hingga jaringan WiFi `TMP` aktif penuh.
-2. **Nyalakan Device 1** — Pegang lurus sesuai arah depan, tunggu hingga layar OLED menampilkan status berjalan (`KOMUNIKASI: SSE`).
+1. **Nyalakan Router / Hotspot** - Tunggu hingga jaringan WiFi `TMP` aktif penuh.
+2. **Nyalakan Device 1** - Pegang lurus sesuai arah depan, tunggu hingga layar OLED menampilkan status berjalan (`KOMUNIKASI: SSE`).
 3. **Nyalakan Device 2** — Ulangi proses kalibrasi hingga layar OLED masuk ke tampilan utama.
 4. **Nyalakan Device N** — Lanjutkan secara bertahap untuk unit berikutnya.
 5. **Hubungkan Laptop / PC** — Sambungkan ke jaringan WiFi `TMP` yang sama.
