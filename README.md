@@ -10,7 +10,7 @@ Perangkat menggunakan **mDNS** sehingga alamat akses otomatis mengikuti nama *ho
 - **Password:** `ugmjaya1`
 - **Endpoint SSE:** `http://mdns_hostname.local/events` *(sesuaikan `mdns_hostname` pada setiap unit perangkat, contoh: pekerja1)*
 
-### ⚠️ Urutan Menyalakan Perangkat
+## ⚠️ Urutan Menyalakan Perangkat
 
 > Disarankan menyalakan perangkat **satu per satu** dan menunggu hingga proses kalibrasi 3 fase selesai sebelum menyalakan perangkat berikutnya.
 
