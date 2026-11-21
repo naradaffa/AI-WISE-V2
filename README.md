@@ -61,11 +61,11 @@ Pegang alat dalam posisi tegak menghadap ke depan saat pertama kali dinyalakan (
 - **PITCH:** Miring Kiri (-), Miring Kanan (+) dalam derajat (`°`)
 - **YAW:** Putar Kiri (+), Putar Kanan (-) dalam derajat (`°`)
 - **Akselerometer:** Percepatan linear dalam $\text{m/s}^2$
-- **Giroskop:** Kecepatan sudut rotasi dalam $\text{deg/s}$ (*deadband* $\pm 1.2\text{ deg/s}$)
+- **Giroskop:** Kecepatan sudut rotasi dalam $\text{deg/s}$
 - **Biometrik:** Detak jantung (BPM) dan saturasi oksigen (%) dari **MAX30102**
 - **Lingkungan:** Suhu ($^\circ\text{C}$) dan kelembapan relatif (%) dari **DHT21**
 - **Lokasi:** Koordinat GPS dari **u-blox NEO-6M**
-- **Baterai:** Persentase kapasitas baterai (**100% dikalibrasi pada 4.05 V**, batas bawah **0% pada 3.30 V**) serta status pengisian daya
+- **Baterai:** Persentase kapasitas baterai serta status pengisian daya
 
 ---
 
