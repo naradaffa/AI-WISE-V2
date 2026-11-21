@@ -62,11 +62,10 @@ Pegang alat dalam posisi tegak menghadap ke depan saat pertama kali dinyalakan (
 - **YAW:** Putar Kiri (+), Putar Kanan (-) dalam derajat (`°`)
 - **Akselerometer (`x`, `y`, `z` & `total`):** Percepatan linear dalam $\text{m/s}^2$
 - **Giroskop (`gx`, `gy`, `gz`):** Kecepatan sudut rotasi dalam $\text{deg/s}$ (*deadband* $\pm 1.2\text{ deg/s}$)
-- **Biometrik (`bpm`, `spo2`):** Detak jantung (BPM) dan saturasi oksigen (%) dari **MAX30102** (perhitungan rasio optik AC/DC Red & IR secara *non-blocking* di 50 Hz; otomatis `0` jika sensor tidak menempel kulit)
-- **Lingkungan (`temp`, `hum`):** Suhu ($^\circ\text{C}$) dan kelembapan relatif (%) dari **DHT21** (pembaruan tiap 5 detik)
+- **Biometrik (`bpm`, `spo2`):** Detak jantung (BPM) dan saturasi oksigen (%) dari **MAX30102**
+- **Lingkungan (`temp`, `hum`):** Suhu ($^\circ\text{C}$) dan kelembapan relatif (%) dari **DHT21**
 - **Lokasi (`lat`, `lng`):** Koordinat GPS dari **u-blox NEO-6M**
-- **Flex Sensor (`flex`):** Pembacaan *voltage divider* mentah (`0 – 4095`) atau sudut SI dalam **radian** (`0.000 – 1.571 rad`) setelah kalibrasi
-- **Baterai (`bat`, `chg`):** Persentase kapasitas baterai LiPo 1S (**100% dikalibrasi pada 4.05 V**, batas bawah **0% pada 3.20 V**) serta status pengisian daya dari pin `CHRG` TP4056
+- **Baterai (`bat`, `chg`):** Persentase kapasitas baterai (**100% dikalibrasi pada 4.05 V**, batas bawah **0% pada 3.30 V**) serta status pengisian daya
 
 ---
 
