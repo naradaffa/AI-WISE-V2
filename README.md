@@ -1,1 +1,118 @@
-AI WISE V2Sistem wearable motion tracking, biometric monitoring, dan fall detection real-time untuk sabuk pekerja. Berbasis ESP32 dengan multi-sensor (MPU6050, QMC5883L, MAX30102, DHT21, GPS NEO-6M, dan Flex Sensor) yang mengirimkan data secara real-time ke Web Dashboard melalui WiFi (Server-Sent Events / SSE) dan mDNS.🚀 Persiapan & Koneksi WiFiBerbeda dengan V1 yang bergantung pada urutan penyalaan IP statis, V2 sudah mendukung mDNS (pekerja10.local) sehingga perangkat dapat dinyalakan secara bersamaan tanpa perlu khawatir bentrok urutan IP.WiFi SSID: TMPPassword: ugmjaya1Endpoint SSE: http://pekerja10.local/events (sesuaikan mdns_hostname jika memiliki lebih dari 1 device)Urutan Menyalakan PerangkatNyalakan Router / Hotspot – Pastikan jaringan WiFi TMP aktif.Nyalakan Perangkat AI WISE V2 – Geser saklar daya ke posisi ON. Perangkat akan otomatis terhubung ke WiFi, mengaktifkan mDNS, dan memulai prosedur kalibrasi di layar OLED.Hubungkan Laptop / PC – Sambungkan ke jaringan WiFi TMP yang sama.🔗 Cara Menjalankan Web DashboardUnduh File Project: Download folder Web Dashboard (format .zip) dari repositori ini.Ekstrak File: Ekstrak file .zip tersebut ke folder komputer Anda.Buka di VS Code:Buka aplikasi Visual Studio Code.Pilih menu File > Open Folder..., lalu pilih folder hasil ekstrak tadi.Jalankan Web Dashboard:Cari file index.html pada panel Explorer di sebelah kiri.Klik kanan pada file index.html, lalu pilih Open with Live Server.Dashboard akan otomatis terbuka di browser dan terhubung ke http://pekerja10.local/events.Catatan: Pastikan ekstensi Live Server oleh Ritwick Dey sudah terinstal di Visual Studio Code.🚨 Kalibrasi & Indikator OLED / BuzzerPada V2, indikator LED digantikan oleh Layar OLED (SSD1306) dan Buzzer. Pegang alat tegak sesuai orientasi pemasangan saat dinyalakan.TahapTampilan OLEDIndikator BuzzerInstruksi & TujuanBootingSistem pekerja10  Inisialisasi...DiamInisialisasi I2C, sensor, dan koneksi WiFi.Fase 1 (1s)Fase 1: DIAMKANBunyi pendek (100 ms)Pegang alat tegak & diam (isolasi gravitasi & bias gyro).Persiapan 2Siap putar 360...DiamJeda 3 detik persiapan memutar alat.Fase 2 (5s)Fase 2: PUTAR 360Bunyi pendek (100 ms)Putar alat 360° datar selama 5 detik (kalibrasi kompas QMC5883L & deteksi sumbu horizontal otomatis).Persiapan 3Hadapkan depan  & diamkan (3 dtk)DiamJeda 3 detik meluruskan orientasi alat ke arah depan.Fase 3Fase 3: KUNCI TITIK 0Bunyi sedang (200 ms)Tahan diam sesaat untuk mengunci referensi sudut 0° (Roll, Pitch, Yaw).BerjalanDEVICE : pekerja10  BAT: xx% / GPS: LOCK  KOMUNIKASI: SSEBunyi selesai (200 ms)Pasang alat di sabuk, transmisi data real-time aktif.📊 Standar Pengukuran & Payload JSONData dikirim melalui endpoint /events dengan nama event sensor_data pada frekuensi 100 Hz (IMU) dan pembaruan periodik untuk sensor lingkungan/biometrik:Orientasi Sudut (roll, pitch, yaw): Satuan derajat ($^\circ$), rentang $-180^\circ$ hingga $+180^\circ$.Akselerometer (x, y, z, total): Percepatan linear dalam $\text{m/s}^2$.Giroskop (gx, gy, gz): Kecepatan sudut rotasi dalam $\text{deg/s}$ (dengan deadband $1.2\text{ deg/s}$).Flex Sensor (flex, flex_raw):flex_raw: Nilai mentah ADC (0–4095) dari rangkaian voltage divider untuk kebutuhan data logging.flex: Konversi sudut tekukan dalam satuan SI radian ($\text{rad}$) ($0^\circ = 0.000\text{ rad}$, $90^\circ = 1.571\text{ rad}$) berdasarkan kalibrasi manual.Biometrik (bpm, spo2): Detak jantung (BPM) dan saturasi oksigen (%) dari sensor MAX30102 (otomatis bernilai 0 jika sensor tidak menempel di kulit / nilai IR $< 50000$).Lingkungan (temp, hum): Suhu ($^\circ\text{C}$) dan kelembapan udara (%) dari DHT21.Lokasi (lat, lng): Koordinat GPS dari NEO-6M (OLED menampilkan GPS: LOCK saat satelit terkunci).Daya (bat, chg): Persentase baterai (0–100%, dikalibrasi penuh $100\%$ pada $4.05\text{ V}$ dan $0\%$ pada $3.20\text{ V}$) serta status pengisian daya (CHARGING).🛠️ Tombol Reset Posisi (Tare Instan)Fungsi: Mengembalikan referensi sudut orientasi (Roll, Pitch, Yaw) ke titik 0.0 secara instan tanpa melakukan reboot sistem.Cara Pakai: Tekan dan tahan tombol (D2) selama 1,5 detik.Indikator Sukses: Buzzer berbunyi selama 300 ms dan layar OLED menampilkan pesan REFERENSI TITIK 0 DIRESET! selama 2 detik.🔧 Catatan Hardware, Kalibrasi & Troubleshooting1. Konfigurasi Pin Hardware (ESP32)KomponenPin ESP32KeteranganI2C Bus (MPU6050, QMC5883L, MAX30102, OLED)SDA: D4, SCL: D5Kecepatan I2C $400\text{ kHz}$GPS NEO-6MRX: D7, TX: D6HardwareSerial 1 ($9600\text{ bps}$)Sensor Suhu DHT21D3Digital InputFlex SensorA0Input Analog (Voltage Divider)Pembacaan Tegangan BateraiD9Input Analog (Voltage Divider $100\text{ k}\Omega + 100\text{ k}\Omega$)Status Charging (TP4056)D10INPUT_PULLUP (LOW = Sedang Mengecas)Tombol TareD2INPUT_PULLUP (Aktif LOW)BuzzerD8Digital Output (Aktif HIGH)2. Kalibrasi & Stabilisasi Flex SensorCek Mandiri (Multimeter): Lepas sensor dari rangkaian dan ukur resistansi langsung pada kedua kakinya. Flex karbon normal bernilai $10\text{ k}\Omega - 45\text{ k}\Omega$ saat lurus dan naik mulus saat ditekuk. Jika terbaca OL atau fluktuatif saat pangkal pin digoyang, jalur internal sensor putus.Mengatasi Noise Sentuhan: Jika nilai ADC melonjak acak saat disentuh jari, isolasi bagian logam/pangkal pin dengan heatshrink dan pasang kapasitor keramik $100\text{ nF}$ (kode 104) di antara pin A0 dan GND.Kalibrasi Sudut (SI Radian): Catat nilai flex_raw saat sensor lurus (FLEX_FLAT_ADC) dan saat ditekuk $90^\circ$ (FLEX_BENT_ADC) menggunakan busur derajat, lalu masukkan kedua konstanta tersebut ke kode firmware.3. Manajemen Daya & Charging (TP4056)Baterai Penuh di $4.05\text{ V}$: Firmware menggunakan fungsi analogReadMilliVolts() dengan pemetaan 320 ($3.20\text{ V} = 0\%$) hingga 405 ($4.05\text{ V} = 100\%$) agar persentase baterai tetap stabil di $100\%$ setelah dilepas dari charger.LED Merah & Biru TP4056 Menyala Bersamaan di $4.1\text{ V}$: Menandakan osilasi di ambang batas penuh ($4.2\text{ V}$). Pastikan saklar alat dalam posisi OFF saat mengecas (saklar memutus jalur OUT+, bukan B+). Jika baterai berkapasitas di bawah $1000\text{ mAh}$, ganti resistor Rprog ($1.2\text{ k}\Omega$) pada modul TP4056 menjadi $2.2\text{ k}\Omega - 3\text{ k}\Omega$ untuk menurunkan arus pengisian.Catatan Jalur GND PCB: Pada revisi PCB saat ini, jalur B- dan OUT- terhubung langsung ke ground plane (mem-bypass proteksi internal TP4056). Pastikan selalu menggunakan baterai LiPo yang sudah dilengkapi modul proteksi (BMS/PCM) internal.📂 Struktur RepositoriESP32 (v2_fix_mpu6050.ino): Kode program utama beserta dependensi (Wire.h, WiFi.h, ESPmDNS.h, ESPAsyncWebServer.h, ArduinoJson.h, TinyGPS++.h, Adafruit_GFX.h, Adafruit_SSD1306.h, DHT.h, MAX30105.h, heartRate.h).Web Dashboard: File antarmuka visual (index.html, style.css, script.js).
+# AI WISE V2
+
+Sistem *wearable motion tracking*, pemantauan biometrik, dan *fall detection* real-time untuk keselamatan pekerja. Berbasis **ESP32** dengan arsitektur *non-blocking* (tanpa FreeRTOS), layar **OLED SSD1306**, **GPS NEO-6M**, **MAX30102**, **DHT21**, **Flex Sensor**, dan transmisi data real-time ke Web Dashboard via WiFi (**Server-Sent Events / SSE**).
+
+---
+
+## 🚀 Persiapan & Koneksi WiFi
+
+Perangkat menggunakan **mDNS** sehingga alamat akses otomatis mengikuti nama *hostname* masing-masing perangkat tanpa perlu mengecek IP dinamis.
+
+- **WiFi SSID:** `TMP`
+- **Password:** `ugmjaya1`
+- **Endpoint SSE:** `[http://pekerja10.local/events](http://pekerja10.local/events)` *(sesuaikan `mdns_hostname` pada setiap unit perangkat)*
+
+### ⚠️ Urutan Menyalakan Perangkat
+
+> ⚠️ **PERINGATAN PENTING:**  
+> Wajib menyalakan perangkat **secara berurutan satu per satu** dan menunggu hingga proses kalibrasi 3 fase selesai sebelum menyalakan perangkat berikutnya. Pastikan setiap unit memiliki `mdns_hostname` yang unik (`pekerja1`, `pekerja2`, dst.) agar tidak terjadi konflik jaringan.
+
+1. **Nyalakan Router / Hotspot** — Tunggu hingga jaringan WiFi `TMP` aktif penuh.
+2. **Nyalakan Device 1** — Pegang lurus sesuai arah depan, tunggu hingga layar OLED menampilkan status berjalan (`KOMUNIKASI: SSE`).
+3. **Nyalakan Device 2** — Ulangi proses kalibrasi hingga layar OLED masuk ke tampilan utama.
+4. **Nyalakan Device N** — Lanjutkan secara bertahap untuk unit berikutnya.
+5. **Hubungkan Laptop / PC** — Sambungkan ke jaringan WiFi `TMP` yang sama.
+
+---
+
+## 🔗 Cara Menjalankan Web Dashboard
+
+1. **Unduh File Project:** Download folder **Web Dashboard** (format `.zip`) dari repositori ini.
+2. **Ekstrak File:** Ekstrak file `.zip` tersebut ke folder komputer Anda.
+3. **Buka di VS Code:**
+   - Buka aplikasi **Visual Studio Code**.
+   - Pilih menu **File** > **Open Folder...**, lalu pilih folder hasil ekstrak tadi.
+4. **Jalankan Web Dashboard:**
+   - Cari file `index.html` pada panel Explorer di sebelah kiri.
+   - Klik kanan pada file `index.html`, lalu pilih **Open with Live Server**.
+   - Dashboard akan otomatis terbuka di browser default Anda.
+
+> **Catatan:** Pastikan ekstensi **Live Server** oleh Ritwick Dey sudah terinstal di Visual Studio Code.
+
+---
+
+## 🚨 Kalibrasi & Indikator OLED / Buzzer
+
+Pegang alat dalam posisi tegak menghadap ke depan saat pertama kali dinyalakan (setelah WiFi terhubung).
+
+| Tahap | Tampilan OLED & Buzzer | Instruksi & Tujuan |
+| :--- | :--- | :--- |
+| **Booting** | `Sistem pekerja10 / Inisialisasi...` | Tunggu inisialisasi sensor I2C dan koneksi WiFi. |
+| **Fase 1 (~1.5s)** | `Fase 1: DIAMKAN` + Bunyi Buzzer 1x | Pegang alat tegak & diam total (kalibrasi bias Accel & Gyro). |
+| **Persiapan 2 (3s)** | `Siap putar 360...` | Bersiap memutar perangkat secara mendatar. |
+| **Fase 2 (5s)** | `Fase 2: PUTAR 360` + Bunyi Buzzer 1x | Putar alat horizontal 360° secara perlahan (kalibrasi *hard-iron* kompas QMC5883L & deteksi sumbu horizontal). |
+| **Persiapan 3 (3s)** | `Hadapkan depan & diamkan (3 dtk)` | Arahkan perangkat lurus ke depan sesuai orientasi pemakaian. |
+| **Fase 3** | `Fase 3: KUNCI TITIK 0` + Bunyi Buzzer 1x | Tahan diam sesaat untuk mengunci referensi titik 0° (Roll, Pitch, Yaw). |
+| **Berjalan** | Status `BAT`, `GPS`, `KOMUNIKASI: SSE` + Buzzer 1x | Pasang di sabuk/tubuh pekerja, perangkat aktif mengirim data 100 Hz. |
+
+---
+
+## 📊 Standar Pengukuran & Parameter Sensor
+
+- **ROLL:** Menunduk (-), Tengadah (+) dalam derajat (`°`)
+- **PITCH:** Miring Kiri (-), Miring Kanan (+) dalam derajat (`°`)
+- **YAW:** Putar Kiri (+), Putar Kanan (-) dalam derajat (`°`)
+- **Akselerometer (`x`, `y`, `z` & `total`):** Percepatan linear dalam $\text{m/s}^2$
+- **Giroskop (`gx`, `gy`, `gz`):** Kecepatan sudut rotasi dalam $\text{deg/s}$ (*deadband* $\pm 1.2\text{ deg/s}$)
+- **Biometrik (`bpm`, `spo2`):** Detak jantung (BPM) dan saturasi oksigen (%) dari **MAX30102** (perhitungan rasio optik AC/DC Red & IR secara *non-blocking* di 50 Hz; otomatis `0` jika sensor tidak menempel kulit)
+- **Lingkungan (`temp`, `hum`):** Suhu ($^\circ\text{C}$) dan kelembapan relatif (%) dari **DHT21** (pembaruan tiap 5 detik)
+- **Lokasi (`lat`, `lng`):** Koordinat GPS dari **u-blox NEO-6M**
+- **Flex Sensor (`flex`):** Pembacaan *voltage divider* mentah (`0 – 4095`) atau sudut SI dalam **radian** (`0.000 – 1.571 rad`) setelah kalibrasi
+- **Baterai (`bat`, `chg`):** Persentase kapasitas baterai LiPo 1S (**100% dikalibrasi pada 4.05 V**, batas bawah **0% pada 3.20 V**) serta status pengisian daya dari pin `CHRG` TP4056
+
+---
+
+## 🛠️ Tombol Reset Posisi (Tare Instan)
+
+- **Fungsi:** Mengembalikan referensi orientasi sudut ke titik `0.0°` (`Roll`, `Pitch`, `Yaw`) tanpa perlu *reboot* perangkat.
+- **Cara Pakai:** Tekan dan tahan tombol (`D2`) selama **1,5 detik**.
+- **Indikator Sukses:** Buzzer berbunyi selama 300 ms dan layar OLED menampilkan `REFERENSI TITIK 0 DIRESET!` selama 2 detik.
+
+---
+
+## 🔌 Konfigurasi Pin Hardware (ESP32)
+
+| Komponen / Fungsi | Pin ESP32 | Keterangan |
+| :--- | :--- | :--- |
+| **I2C SDA** (MPU6050, QMC5883L, MAX30102, OLED) | `D4` | Kecepatan bus 400 kHz (*Fast Mode*) |
+| **I2C SCL** (MPU6050, QMC5883L, MAX30102, OLED) | `D5` | Kecepatan bus 400 kHz (*Fast Mode*) |
+| **GPS NEO-6M (RX / TX)** | `D7` / `D6` | UART Serial1 (9600 bps) |
+| **Sensor Suhu & Kelembapan (DHT21)** | `D3` | Digital One-Wire |
+| **Flex Sensor** | `A0` | Input Analog ADC (*Voltage Divider*) |
+| **Buzzer Aktif** | `D8` | Output Digital |
+| **Tombol Tare / Reset Posisi** | `D2` | `INPUT_PULLUP` (Aktif `LOW`) |
+| **Sensor Tegangan Baterai** | `D9` | Pembagi tegangan 1:2 (`analogReadMilliVolts`) |
+| **Status Charging (TP4056)** | `D10` | `INPUT_PULLUP` (`LOW` = Sedang mengisi daya) |
+
+---
+
+## 🔧 Catatan Kalibrasi & Troubleshooting Hardware
+
+### 1. Flex Sensor (Voltage Divider & Stabilitas)
+- **Logging Data Mentah:** Sesuai standar pembacaan pembagi tegangan murni, data `flex` dapat di-*logging* apa adanya dalam rentang nilai ADC mentah (`0 – 4095`) maupun dikonversi ke satuan SI (**radian**) berdasarkan nilai titik lurus (`FLEX_FLAT_ADC`) dan tekuk maksimal (`FLEX_BENT_ADC`).
+- **Mengatasi Nilai Fluktuatif (50–100 diam vs 500–2500 saat disentuh):**
+  - Pastikan jalur resistor pembagi ke `GND` tersambung solid (tidak *floating*).
+  - Lapisi area sensor dan pangkal kaki pin menggunakan selotip isolasi / *heatshrink* agar tidak terjadi kontak langsung dengan kulit tangan yang memicu *noise* 50 Hz.
+  - Tambahkan kapasitor keramik **100 nF (kode `104`)** paralel antara pin `A0` dan `GND` untuk meredam lonjakan *noise*.
+  - Gunakan **Op-Amp Rail-to-Rail 3.3V** (seperti **MCP6002** atau **LMV358**) sebagai *impedance buffer* hanya jika menggunakan sensor berimpedansi sangat tinggi ($>100\text{ k}\Omega$ hingga $\text{M}\Omega$).
+
+### 2. Manajemen Daya & Charging (TP4056)
+- **Kalibrasi Persentase Baterai:** Batas atas tegangan penuh ditetapkan pada **4.05 V = 100%** menggunakan fungsi `analogReadMilliVolts()` dengan *exponential moving average* agar indikator tetap stabil dan tidak tertahan di angka 90%-an saat tegangan baterai mulai turun setelah dilepas dari *charger*.
+- **Isolasi Jalur Baterai:** Saat melakukan pengujian atau *flashing* melalui USB tanpa baterai terpasang, pastikan modul TP4056 tidak mengalami arus balik (*back-feeding*) ke jalur baterai, dan gunakan dioda pemisah (*power path*) atau sakelar fisik pada jalur baterai menuju regulator 3.3V ESP32.
+
+---
+
+## 📂 Struktur Repositori
+
+- **ESP32 (`v2_fix_mpu6050.ino`):** Kode program utama *non-blocking* (100 Hz IMU & SSE, 50 Hz MAX30102, 5 Hz ADC/Baterai, 0.2 Hz DHT21) beserta dependensi (`Wire.h`, `WiFi.h`, `ESPmDNS.h`, `ESPAsyncWebServer`, `ArduinoJson`, `TinyGPS++`, `Adafruit_GFX`, `Adafruit_SSD1306`, `DHT`, `MAX30105`).
+- **Web Dashboard:** File antarmuka visual berbasis web (`index.html`, `style.css`, `script.js`) yang menerima aliran data *real-time* melalui protokol SSE.
